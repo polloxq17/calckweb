@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envios Joseph USA-CR</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+        .result p {
+            margin: 5px 0;
+        }
+
+        .reset-button {
+            margin-top: 10px;
+            background-color: #dc3545;
+        }
+        .reset-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Envios Joseph USA-CR</h1>
+
+        <label for="nombre">Nombre del producto:</label>
+        <input type="text" id="nombre" placeholder="Ingresa el nombre">
+
+        <label for="precio">Precio en dólares:</label>
+        <input type="number" id="precio" placeholder="Ingresa el precio" step="0.01">
+
+        <label for="libras">Número de libras:</label>
+        <input type="number" id="libras" placeholder="Ingresa las libras" step="0.01">
+
+        <label for="precioEnvio">Costo de envío por libra a CR (USD):</label>
+        <input type="number" id="precioEnvio" placeholder="Ingresa el precio por libra" step="0.01">
+
+        <label for="impuesto">Impuesto (7% Florida / 9.5% Arkansas):</label>
+        <input type="number" id="impuesto" placeholder="Ingresa el impuesto" step="0.01">
+
+        <label for="tasaCambio">Tipo de cambio (dólar a colón):</label>
+        <input type="number" id="tasaCambio" placeholder="Ingresa la tasa de cambio" step="0.01">
+
+        <label for="moneda">Moneda:</label>
+        <select id="moneda">
+            <option value="dolar">Dólares</option>
+            <option value="colon">Colones</option>
+        </select>
+
+        <button onclick="calcularTotal()">Calcular Total</button>
+
+        <div class="result" id="resultado"></div>
+
+        <button class="reset-button" onclick="resetFormulario()">Limpiar Campos</button>
+    </div>
+
+    <script>
+        function calcularTotal() {
+            // Obtener los valores de los campos
+            let nombre = document.getElementById('nombre').value;
+            let precio = parseFloat(document.getElementById('precio').value);
+            let libras = parseFloat(document.getElementById('libras').value);
+            let precioEnvio = parseFloat(document.getElementById('precioEnvio').value);
+            let impuesto = parseFloat(document.getElementById('impuesto').value) || 0;
+            let tasaCambio = parseFloat(document.getElementById('tasaCambio').value);
+            let moneda = document.getElementById('moneda').value;
+
+            // Verificar que se hayan ingresado valores válidos
+            if (isNaN(precio) || isNaN(libras) || isNaN(precioEnvio) || precio <= 0 || libras <= 0 || precioEnvio <= 0 || (moneda === 'colon' && (isNaN(tasaCambio) || tasaCambio <= 0))) {
+                document.getElementById('resultado').innerHTML = '<p>Por favor, ingresa valores numéricos válidos para todos los campos.</p>';
+                return;
+            }
+
+            // Calcular el costo total de envío
+            let totalEnvio = libras * precioEnvio;
+
+            // Calcular impuestos
+            let impuestoAplicado = (precio * impuesto) / 100;
+
+            // Calcular el total final
+            let total = precio + totalEnvio + impuestoAplicado;
+
+            // Convertir a colones si es necesario
+            if (moneda === 'colon') {
+                total = total * tasaCambio;
+            }
+
+            // Mostrar los resultados en líneas separadas
+            document.getElementById('resultado').innerHTML = `
+                <p><strong>Producto:</strong> ${nombre}</p>
+                <p><strong>Precio del producto:</strong> $${precio.toFixed(2)}</p>
+                <p><strong>Total de envío (${libras} libras):</strong> $${totalEnvio.toFixed(2)}</p>
+                <p><strong>Impuesto aplicado:</strong> +$${impuestoAplicado.toFixed(2)}</p>
+                <p><strong>Total a pagar (${moneda === 'dolar' ? 'USD' : 'CRC'}):</strong> ${moneda === 'dolar' ? '$' : '₡'}${total.toFixed(2)}</p>
+            `;
+        }
+
+        function resetFormulario() {
+            document.getElementById('nombre').value = '';
+            document.getElementById('precio').value = '';
+            document.getElementById('libras').value = '';
+            document.getElementById('precioEnvio').value = '';
+            document.getElementById('impuesto').value = '';
+            document.getElementById('tasaCambio').value = '';
+            document.getElementById('moneda').value = 'dolar';
+            document.getElementById('resultado').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
