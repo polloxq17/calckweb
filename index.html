@@ -67,11 +67,16 @@
         <label for="libras">Número de libras:</label>
         <input type="number" id="libras" placeholder="Ingresa las libras" step="0.01">
 
-        <label for="precioEnvio">Costo de envío por libra a CR (USD):</label>
+        <label for="precioEnvio">Costo de envío por libra a CR ($USD):</label>
         <input type="number" id="precioEnvio" placeholder="Ingresa el precio por libra" step="0.01">
 
-        <label for="impuesto">Impuesto (7% Florida / 9.5% Arkansas):</label>
-        <input type="number" id="impuesto" placeholder="Ingresa el impuesto" step="0.01">
+        <label for="impuesto">Impuesto (%):</label>
+        <select id="impuesto">
+            <option value="0">Seleciona Impuesto</option>
+            <option value="7">Florida: 7%</option>
+            <option value="9.5">Arkansas: 9.5%</option>
+            <!-- Añade aquí más categorías según lo necesario -->
+        </select>
 
         <label for="tasaCambio">Tipo de cambio (dólar a colón):</label>
         <input type="number" id="tasaCambio" placeholder="Ingresa la tasa de cambio" step="0.01">
@@ -90,19 +95,23 @@
     </div>
 
     <script>
+        function formatNumber(num) {
+            return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
         function calcularTotal() {
             // Obtener los valores de los campos
             let nombre = document.getElementById('nombre').value;
             let precio = parseFloat(document.getElementById('precio').value);
-            let libras = parseFloat(document.getElementById('libras').value);
-            let precioEnvio = parseFloat(document.getElementById('precioEnvio').value);
+            let libras = parseFloat(document.getElementById('libras').value) || 0;
+            let precioEnvio = parseFloat(document.getElementById('precioEnvio').value) || 0;
             let impuesto = parseFloat(document.getElementById('impuesto').value) || 0;
-            let tasaCambio = parseFloat(document.getElementById('tasaCambio').value);
+            let tasaCambio = parseFloat(document.getElementById('tasaCambio').value) || 0;
             let moneda = document.getElementById('moneda').value;
 
             // Verificar que se hayan ingresado valores válidos
-            if (isNaN(precio) || isNaN(libras) || isNaN(precioEnvio) || precio <= 0 || libras <= 0 || precioEnvio <= 0 || (moneda === 'colon' && (isNaN(tasaCambio) || tasaCambio <= 0))) {
-                document.getElementById('resultado').innerHTML = '<p>Por favor, ingresa valores numéricos válidos para todos los campos.</p>';
+            if (isNaN(precio) || precio <= 0 || (moneda === 'colon' && tasaCambio <= 0)) {
+                document.getElementById('resultado').innerHTML = '<p>Por favor, ingresa valores numéricos válidos para todos los campos obligatorios.</p>';
                 return;
             }
 
@@ -123,10 +132,10 @@
             // Mostrar los resultados en líneas separadas
             document.getElementById('resultado').innerHTML = `
                 <p><strong>Producto:</strong> ${nombre}</p>
-                <p><strong>Precio del producto:</strong> $${precio.toFixed(2)}</p>
-                <p><strong>Total de envío (${libras} libras):</strong> $${totalEnvio.toFixed(2)}</p>
-                <p><strong>Impuesto aplicado:</strong> +$${impuestoAplicado.toFixed(2)}</p>
-                <p><strong>Total a pagar (${moneda === 'dolar' ? 'USD' : 'CRC'}):</strong> ${moneda === 'dolar' ? '$' : '₡'}${total.toFixed(2)}</p>
+                <p><strong>Precio del producto:</strong> $${formatNumber(precio)}</p>
+                ${libras > 0 && precioEnvio > 0 ? `<p><strong>Total de envío (${libras} libras):</strong> $${formatNumber(totalEnvio)}</p>` : ''}
+                <p><strong>Impuesto aplicado:</strong> +$${formatNumber(impuestoAplicado)}</p>
+                <p><strong>Total a pagar (${moneda === 'dolar' ? 'USD' : 'CRC'}):</strong> ${moneda === 'dolar' ? '$' : '₡'}${formatNumber(total)}</p>
             `;
         }
 
@@ -135,7 +144,7 @@
             document.getElementById('precio').value = '';
             document.getElementById('libras').value = '';
             document.getElementById('precioEnvio').value = '';
-            document.getElementById('impuesto').value = '';
+            document.getElementById('impuesto').value = '0';
             document.getElementById('tasaCambio').value = '';
             document.getElementById('moneda').value = 'dolar';
             document.getElementById('resultado').innerHTML = '';
@@ -143,3 +152,4 @@
     </script>
 </body>
 </html>
+
